@@ -1,0 +1,226 @@
+---
+title: "Tidyverse EXTEND"
+author: "Keeno Glanville"
+date: "2022-11-21"
+output: html_document
+
+
+#title: "Vignette Title"
+#author: "Karma Gyatso"
+#date: "`r Sys.Date()`"
+#output: rmarkdown::html_vignette
+
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+```
+
+
+## Loading data from github, which was downloaded from Kaggle. classifying the dataset type and printing all the names of the variables. 
+```{r}
+patient_records_test <- read.csv("https://raw.githubusercontent.com/karmaggyatso/CUNY_SPS/main/Github_data607/tidyverse_assignment/Train-1617360447408-1660719685476.csv")
+
+```
+
+```{r}
+class(patient_records_test)
+```
+
+```{r}
+names(patient_records_test)
+
+```
+
+
+## Research question 
+**What is the main factor of patient readmission in the hospital? Are the treatment and age group the reason for readmission? What are the chances of readmission based on medical treatment and age group?**
+
+
+
+## Cases 
+
+**Each case represents individual patient who went to hospital for treatment. There are *66,587* observations**
+
+```{r}
+dim(patient_records_test)
+```
+
+## Resources
+**Data source cited in MLA 9th edition**
+ + Vutukuri, Girish. “Hospital_Administration.” Hospital_Administration | Kaggle, www.kaggle.com/datasets/girishvutukuri/hospital-administration/code?resource=download. Accessed 30 Oct. 2022.
+ 
+ 
+## Analysis
+
+**Data cleaning**
+There is a data with medical_treatment as "?". Since we are not sure what sort of medical_treatement it is, we are omitting the records in the new variable. We're grouping the type of medical_treatement and counting how many patient has readmitted. 
+```{r}
+hospital_readmission_by_treatment <- patient_records_test %>% 
+  filter(readmitted == 1) %>%
+  filter(medical_specialty != "?") %>%
+  group_by(medical_specialty) %>%
+  count() %>% 
+  arrange(desc(n))
+
+
+hospital_readmission_by_treatment
+
+```
+
+A graphical representation of above code. 
+```{r}
+ggplot(hospital_readmission_by_treatment, aes(x = medical_specialty, y = n)) +
+  geom_bar(stat = "identity") +
+  theme(text = element_text(size = 6),element_line(size = 2)) +
+  coord_flip() 
+```
+
+We also have to consider the age as an factor. So, I am grouping the age and counting total readmission. 
+```{r}
+
+hospital_readmission_by_age <- patient_records_test %>% 
+  filter(readmitted == 1) %>%
+  group_by(age) %>%
+  count() %>% 
+  arrange(desc(n))
+
+hospital_readmission_by_age
+```
+
+A graphical representation of above code. 
+```{r}
+ggplot(hospital_readmission_by_age, aes(x = age, y = n)) +
+  geom_bar(stat = "identity") + 
+  labs(title= "Hospital readmission by age",
+       x="age_group",y="total count")+
+  coord_flip()
+  
+```
+
+## Conclusion:
+Those patients who had visited hospital for **internalMedicine** as a medical_treatment are most readmitted. Also the age group between 80-90 are also readmitted to the hospital. Further analysis can be done on age with most medical_treatment applied. 
+
+I have used the tidyverse,dplyr fucntions such as piping fuction, filter and group_by function.
+
+
+
+
+
+
+# EXTEND
+
+Within this dataset one of the research questions was *What are the chances of readmission based on medical treatment and age group?*
+To solve this question we will utilize the *forcats* package which is a package
+meant to work with factors within datasets. We could utilize this function to then
+create a logistic regression of readmission chances.
+
+# Fct_infreq
+  This function allows us to see the frequency of factors within our data and thus
+  it gives us insight into some of the stronger factors within the data
+
+## Comparison of race on readmittance
+We see in this example that African Americans and Other are more prevelant to no
+readmission
+```{r}
+#Revise the data to utilize all relevant data only
+library(caret)
+cleandata <- patient_records_test%>%
+  select(-1,-2,-3,-7, -X8, -X18, -X19, -X25)%>%
+  mutate(readmitted= as.factor(readmitted))
+data1<- cleandata%>%
+  filter(readmitted == 1)
+data0<- cleandata%>%
+  filter(readmitted == 0)
+
+
+ggplot(data1) +
+  geom_bar(mapping = aes(x = fct_rev(fct_infreq(race)))) +
+  coord_flip()
+ggplot(data0) +
+  geom_bar(mapping = aes(x = fct_rev(fct_infreq(race)))) +
+  coord_flip()
+```
+
+
+
+
+# Comparison of age on readmittance
+We see in this example that overall less people are readmitted than admitted, however 
+the 60-70 range shows us that a greater magnitude of itspopulation is not readmitted
+```{r}
+ggplot(data1) +
+  geom_bar(mapping = aes(x = fct_rev(fct_infreq(age)))) +
+  coord_flip()
+ggplot(data0) +
+  geom_bar(mapping = aes(x = fct_rev(fct_infreq(age)))) +
+  coord_flip()
+
+```
+
+
+# Comparison of Gender on readmittance
+In this example it is unclear fo the magnitude of thos who are readmitted vs not
+however we see mean are readmitted less. This could be due to other factors.
+```{r}
+ggplot(data1) +
+  geom_bar(mapping = aes(x = fct_rev(fct_infreq(gender)))) +
+  coord_flip()
+ggplot(data0) +
+  geom_bar(mapping = aes(x = fct_rev(fct_infreq(gender)))) +
+  coord_flip()
+
+```
+
+# Comparison of Medicalspecialty on readmittance
+Medical specialty is a very wide range and unclear how each factor affects readmission
+```{r}
+ggplot(data1) +
+  geom_bar(mapping = aes(x = fct_rev(fct_infreq(medical_specialty)))) +
+  coord_flip()
+ggplot(data0) +
+  geom_bar(mapping = aes(x = fct_rev(fct_infreq(medical_specialty)))) +
+  coord_flip()
+
+```
+
+# Predicting Readmittance
+Due to the computational power it would need to predict everything, I will select various factors
+
+```{r}
+testing <- cleandata
+train_portion = .7
+train_index <- createDataPartition(testing$readmitted,p = train_portion, list = FALSE,times = 1)
+trainset <- testing[train_index,]
+testset <- testing[-train_index,]
+
+
+log_model <- train(readmitted ~ age + race + gender+ time_in_hospital + num_lab_procedures+ num_procedures+ num_medications+ number_diagnoses+ diabetesMed , 
+                   data = trainset,
+                   method="glm", family = "binomial")
+
+train_preds <- predict(log_model,newdata = trainset)
+test_preds <- predict(log_model,newdata = testset)
+
+confusionMatrix(train_preds,trainset$readmitted)
+```
+
+
+# Conclusion
+While our predictive model was not the strongest due to computational power. Our 
+key takeaway is that the utilization of the *forcats* package can help us better
+work with our factor variables as they could demonstrate importance within our datasets
+
+
+
+
