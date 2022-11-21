@@ -5,6 +5,9 @@
 # EXTEND KarmaGyatsuo example using forcats package
 Initial submission : https://github.com/kglan/FALL2022TIDYVERSE/blob/cd45c2b357bd5fb17ae9a2defb41f9366ce18ef3/TidyverseVignette.Rmd
 EXtend submission: https://github.com/kglan/FALL2022TIDYVERSE/blob/cd45c2b357bd5fb17ae9a2defb41f9366ce18ef3/TidyverseExtend%20Keeno%20Glanville.rmd
+-Keeno Glanville
+
+
 
 # Using readxl package
 Initial Description and Link: 
