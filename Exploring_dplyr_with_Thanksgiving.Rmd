@@ -1,0 +1,69 @@
+---
+title: "Data 607 Tidyverse Create Assignment"
+author: "Wilson Chau"
+date: "2022-10-30"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+I took this dataset from 
+Tidyverse packages consists of many different uses. These are the few I looked up:
+ggplot
+dplyr
+tidyr
+readr
+purrr
+tibble
+stringr
+forcats
+
+I wanted to focus on dplyr because of the package's abiltiy to dtransform and summarize tabular data with row. I also wanted to focus more on having descriptive data with some numerical data to play around with.
+
+One set of data I took was the Thanksgiving choice/poll for 2015. 
+https://fivethirtyeight.com/features/heres-what-your-part-of-america-eats-on-thanksgiving/
+Let's get started on using DPLYR functions. 
+
+```{r}
+thanksgiving = read.csv('https://raw.githubusercontent.com/Wilchau/Data_607_tidyverse_create_Thanksgiving/main/thanksgiving-2015-poll-data.csv')
+```
+
+Important dplyr verbs to remember:
+select()	select columns
+filter()	filter rows
+arrange()	re-order or arrange rows
+mutate()	create new columns
+summarise()	summarise values
+group_by()	allows for group operations in the “split-apply-combine” concept
+
+I focus on the columns that talks about celebrating Thanksgiving
+
+
+##Question 1: Can you select and view the following columns: Age group, Household income, and US region? 
+Answer: use select()
+```{r}
+thanksgiving_info <- select(thanksgiving, Age, How.much.total.combined.money.did.all.members.of.your.HOUSEHOLD.earn.last.year., US.Region )
+head(thanksgiving_info)
+```
+#Question 2: Can you find the number of particpants over the age of 30?
+A:  Use filter() follow by operator > 
+```{r}
+thanksgiving_info %>% 
+  filter(Age > 30)
+```
+## Question 3: Can you sort the Age 60+ with highest to lowest income
+```{r}
+thanksgiving_info %>% 
+  filter(Age > 60) %>%
+  arrange(((How.much.total.combined.money.did.all.members.of.your.HOUSEHOLD.earn.last.year.)))
+```
+
+## Question 4: What is the most celebrated region?
+Answer: Use group_by()
+```{r}
+thanksgiving %>% 
+  group_by(Do.you.celebrate.Thanksgiving., US.Region) %>%
+  summarize(count=n())
+```
