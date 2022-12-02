@@ -33,6 +33,9 @@ glimpse(tuition_data)
 head(diversity_data)
 head(tuition_data)
 
+
+Another way of looking through data:
+xdata[1:5,]
 ```
 
 #4. Using dplyr in the tidyverse package, do a left join on the two dataframes for analysis. The function adds columns from the two dataframes based on the specified keys, in this case, name and state, and as a left join, includes all rows from the first column, in this case, tuition cost. There are some NAs in the room_and_board column that should be investigated but for now, I will ignore those. 
@@ -45,7 +48,9 @@ combined_df <- tuition_data %>%
 
 combined_df
 
+This is a great way to use this.
 ```
+
 
 #5.Plot per category enrollment against in-state tutition using ggplot 
 
